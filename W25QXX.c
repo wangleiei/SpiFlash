@@ -1,4 +1,7 @@
 #include "W25QXX.h"
+
+#include  "Interface.h"
+
 static void W25QCSXX_Write_Enable(W25QCS_BASE * base);  
 static void W25QCSXX_Write_Disable(W25QCS_BASE * base); 
 static void W25QCSXX_Write_NoCheck(W25QCS_BASE * base,uint8_t* pBuffer,uint32_t WriteAddr,uint16_t NumByteToWrite);  
@@ -142,16 +145,20 @@ void W25QCSXX_Read(W25QCS_BASE * base,uint8_t* pBuffer,uint32_t ReadAddr,uint16_
 *	返 回 值: 
 *   说    明: 
 *********************************************************************************************************/
-void W25QCS_Write(W25QCS_BASE * base,uint32_t addr,uint8_t* ptr,uint16_t len){
+uint8_t W25QCS_Write(W25QCS_BASE * base,uint32_t addr,uint8_t* ptr,uint16_t len){
 	
 	uint8_t i = 0;
 	uint8_t page_num = len>>8;
 	uint8_t relase_num = len&0x00ff;
+	// TST_Print_EX("addr %xptr %xlen %d\n",addr,ptr,len);
 	if(len>256){
-		for(i = 0;i<page_num;i++){
-			W25QCSXX_Write_Page(base,(uint8_t *)(ptr+i*256),i*256,256);
+		for(i = 0;i<page_num;i++){//16
+			W25QCSXX_Write_Page(base,(uint8_t *)(ptr+i*256),addr+i*256,256);
 		}
-		W25QCSXX_Write_Page(base,(uint8_t *)(ptr+i*256),i*256,relase_num);		
+		if(0 != relase_num){
+			W25QCSXX_Write_Page(base,(uint8_t *)(ptr+i*256),addr+i*256,relase_num);		
+		}
+		
 	}
 	else{
 		W25QCSXX_Write_Page(base,ptr,addr,len);
@@ -263,7 +270,8 @@ void W25Q_Init(W25QCS_BASE * base,
 					// spi时序要求，时钟平时是低，上升沿捕获，高位在前，8字节数据长度,
 					uint8_t (*W25QCS_SPI_RW)(uint8_t a_u8),
 					uint8_t (*DELAY_MS)(uint32_t a_u8),
-					uint32_t size_MB
+					uint32_t size_MB,
+					 DEV_TYPE dev_type
 					){
 	// base->dev_sta = W25QCS_IDLE;
 	base->good_trans_count_u16 = 0;
