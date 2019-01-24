@@ -1,4 +1,4 @@
-#include "W25QXX.h"
+﻿#include "W25QXX.h"
 
 #include  "Interface.h"
 
@@ -13,7 +13,7 @@ enum W25QCOMMAND {
 	W25X_WriteEnable		= 0x06 ,
 	W25X_WriteDisable		= 0x04 ,
 	W25X_ReadStatusReg1		= 0x05 ,
-	W25X_ReadStatusReg2		= 0x35 ,
+	W25X_ReadStatusReg2		= 0x35 , 
 	W25X_ReadStatusReg3		= 0x15 ,
 	W25X_WriteStatusReg		= 0x01 ,
 	W25X_ReadData			= 0x03 ,
